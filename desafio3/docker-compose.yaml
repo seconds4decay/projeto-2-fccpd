@@ -1,0 +1,44 @@
+version: '3.9'
+
+services:
+  web:
+    build: ./web
+    container_name: web_app
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - DATABASE_HOST=db
+      - REDIS_HOST=cache
+    depends_on:
+      - db
+      - cache
+    networks:
+      - backend
+
+  db:
+    image: postgres:15
+    container_name: db_service
+    restart: always
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=meubanco
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  cache:
+    image: redis:7
+    container_name: cache_service
+    restart: always
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  pgdata:

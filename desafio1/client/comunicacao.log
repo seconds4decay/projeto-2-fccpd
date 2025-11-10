@@ -1,0 +1,18 @@
+ERROR:root:Erro ao conectar: HTTPConnectionPool(host='server', port=8080): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x712f143bbb00>: Failed to establish a new connection: [Errno 111] Connection refused'))
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.20.0.2:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:root:Resposta do servidor: Hello, World!
+INFO:root:Resposta do servidor: Hello, World!
+INFO:root:Resposta do servidor: Hello, World!
+INFO:root:Resposta do servidor: Hello, World!
+INFO:root:Resposta do servidor: Hello, World!
+INFO:root:Resposta do servidor: Hello, World!
+INFO:root:Resposta do servidor: Hello, World!
+INFO:root:Resposta do servidor: Hello, World!
+INFO:root:Resposta do servidor: Hello, World!
+INFO:root:Resposta do servidor: Hello, World!
+INFO:root:Resposta do servidor: Hello, World!
+INFO:root:Resposta do servidor: Hello, World!
