@@ -82,7 +82,7 @@ docker run -d   --name client   --network minha_rede   -p 5000:5000   -v cliente
 
 ---
 
-## 🔍 Testar a Comunicação
+## Testar a Comunicação
 
 Acesse o cliente Flask (porta 5000) para ver o status da última resposta recebida do servidor:
 
@@ -177,11 +177,6 @@ Abra no navegador ou use o `curl`:
 curl http://localhost:8080
 ```
 
-Saída esperada:
-```
-{"status": "dados inseridos!"}
-```
-
 ---
 
 ### Remover o container do banco
@@ -211,11 +206,6 @@ Abra no navegador ou rode:
 
 ```bash
 curl http://localhost:8081
-```
-
-Saída esperada:
-```json
-{"usuarios": [[1, "Lucas"], [2, "Maria"], [3, "João"]]}
 ```
 
 Mesmo após apagar o container do banco, os dados permanecem.
@@ -279,7 +269,7 @@ docker-compose up --build
 
 2. Acesse a aplicação:
 
-👉 [http://localhost:5000](http://localhost:5000)
+[http://localhost:5000](http://localhost:5000)
 
 ## O que a aplicação faz
 
