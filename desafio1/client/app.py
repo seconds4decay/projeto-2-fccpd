@@ -13,10 +13,12 @@ def requisitar_periodicamente():
         try:
             r = requests.get("http://server:8080")
             status["ultima_resposta"] = r.text
+            print(f"Resposta do servidor: {r.text}")
             logging.info(f"Resposta do servidor: {r.text}")
             
         except Exception as e:
             status["ultima_resposta"] = f"Erro: {e}"
+            print(f"Erro ao conectar: {e}")
             logging.error(f"Erro ao conectar: {e}")
         time.sleep(5)
 

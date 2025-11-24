@@ -2,9 +2,9 @@ FROM python:3.12-slim
 
 WORKDIR /app
 COPY app.py .
-COPY requiremets.txt .
+COPY requirements.txt .
 
-RUN pip install -r requiremets.txt
+RUN pip install -r requirements.txt
 
 EXPOSE 5000
 CMD ["python", "app.py"]

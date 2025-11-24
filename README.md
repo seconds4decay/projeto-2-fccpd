@@ -4,18 +4,19 @@ Criar dois containers que se comunicam por uma rede Docker customizada.
 
 ---
 
-## Estrutura de Projeto
+## Estrutura do Projeto
 
 ```
-.
-├── cliente/
-│   ├── app.py
-│   ├── requirements.txt
-│   ├── Dockerfile
-└── servidor/
-    ├── app.py
-    ├── requirements.txt
-    ├── Dockerfile
+
+cliente/
+├── app.py
+├── requirements.txt
+└── Dockerfile
+
+servidor/
+├── app.py
+├── requirements.txt
+└── Dockerfile
 ```
 
 ---
@@ -32,35 +33,10 @@ docker network create minha_rede
 
 ## Construir as Imagens
 
-### Servidor Flask
-Entre na pasta `servidor` e construa a imagem:
-
 ```bash
-cd servidor
-docker build -t flask-server .
-cd ..
+docker build -t flask-server ./server
+docker build -t flask-client ./client
 ```
-
-### Cliente Flask
-Entre na pasta `cliente` e construa a imagem:
-
-```bash
-cd cliente
-docker build -t flask-client .
-cd ..
-```
-
----
-
-## Criar o Volume para Persistência de Logs
-
-Crie um volume para armazenar os logs do cliente fora do container:
-
-```bash
-docker volume create cliente_logs
-```
-
-Esse volume será montado em `/app/comunicacao.log` dentro do container cliente.
 
 ---
 
@@ -74,10 +50,10 @@ docker run -d   --name server   --network minha_rede   -p 8080:8080   flask-serv
 ```
 
 ### Iniciar o Cliente
-Rode o container do cliente Flask conectado à mesma rede, com o volume de logs:
+Rode o container do cliente Flask conectado à mesma rede, as logs de comunicação do cliente serão criadas na pasta raiz.
 
 ```bash
-docker run -d   --name client   --network minha_rede   -p 5000:5000   -v cliente_logs:/app/comunicacao.log   flask-client
+docker run -d   --name client   --network minha_rede   -p 5000:5000   -v ./:/app/   flask-client
 ```
 
 ---
@@ -102,6 +78,7 @@ Você deve ver algo como:
 
 ```bash
 docker rm -f client server
+docker image rm client server
 docker network rm minha_rede
 docker volume rm cliente_logs
 ```
@@ -122,14 +99,16 @@ Dois containers são usados:
 ## Estrutura do Projeto
 
 ```
-.
-├── db/
-│   ├── app.py          # Cria e insere dados no SQLite
-│   └── Dockerfile
-├── leitor/
-│   ├── app.py          # Lê dados do mesmo SQLite
-│   └── Dockerfile
-└── README.md
+
+db/
+├── app.py
+├── Dockerfile
+└── requirements.txt
+
+leitor/
+├── app.py
+├── Dockerfile
+└── requirements.txt
 ```
 
 ---
@@ -169,6 +148,14 @@ docker run -d   --name db   --network minha-rede   -p 8080:8080   -v dados-sqlit
 
 ---
 
+### Rodar o container leitor
+
+```bash
+docker run -d   --name leitor   --network minha-rede   -p 5000:5000   -v dados-sqlite:/data   leitor-flask
+```
+
+---
+
 ### Inserir dados no banco
 
 Abra no navegador ou use o `curl`:
@@ -190,13 +177,6 @@ docker rm db
 
 O volume `dados-sqlite` ainda contém o banco `meubanco.db`.
 
----
-
-### Rodar o container leitor
-
-```bash
-docker run -d   --name leitor   --network minha-rede   -p 8081:8081   -v dados-sqlite:/data   leitor-flask
-```
 
 ---
 
@@ -205,7 +185,7 @@ docker run -d   --name leitor   --network minha-rede   -p 8081:8081   -v dados-s
 Abra no navegador ou rode:
 
 ```bash
-curl http://localhost:8081
+curl http://localhost:5000
 ```
 
 Mesmo após apagar o container do banco, os dados permanecem.
@@ -219,6 +199,7 @@ Para remover tudo:
 ```bash
 docker stop leitor
 docker rm leitor
+docker image rm leitor
 docker volume rm dados-sqlite
 docker network rm minha-rede
 ```
@@ -244,20 +225,19 @@ Usar Docker Compose para orquestrar múltiplos serviços dependentes.
 
 ### 1. Web (Flask)
 
-* Conecta ao PostgreSQL e Redis para testar comunicação.
-* Variáveis de ambiente:
-  * `DATABASE_HOST`: endereço do banco (default: `db`)
-  * `REDIS_HOST`: endereço do redis (default: `cache`)
-* Exposta na porta 5000.
+Conecta ao PostgreSQL e Redis para testar comunicação.
+Variáveis de ambiente:
+- `DATABASE_HOST`: endereço do banco (default: `db`)
+- `REDIS_HOST`: endereço do redis (default: `cache`)
+Exposta na porta 5000.
 
 ### 2. Banco de Dados (PostgreSQL)
 
-* Credenciais definidas em `docker-compose.yml`
-* Persistência via volume `pgdata`.
+Persistência via volume `pgdata`.
 
 ### 3. Cache (Redis)
 
-* Utilizado para simples teste de escrita/leitura.
+Utilizado para simples teste de escrita/leitura.
 
 ## Como rodar o projeto
 
@@ -322,7 +302,7 @@ service_b/
 
 ---
 
-### Serviço B
+### Serviço 2
 - Consome os dados do Serviço A por HTTP Request e retorna uma lista de mensagens formatadas.
 
 ---
@@ -330,26 +310,21 @@ service_b/
 ## Execução
 
 ### Construir e iniciar os containers
-Na raiz dos serviços (`service1/`) e (`service2/`), execute o comando para buildar as imagens:
+Execute os comandos para buildar as imagens:
 
-Para o service 1:
 ```bash
-docker build -t service1 .
-```
-
-Para o service 2:
-```bash
-docker build -t service2 .
+docker build -t service1 ./service1
+docker build -t service2 ./service2
 ```
 
 E depois, para executar os containers no mesmos diretorios:
 
 ```bash
-docker run -p 5000:5000 --name service1
+docker run -d -p 5000:5000 --name service1 service1
 ```
 
 ```bash
-docker run -p 5001:5001 --name service2
+docker run -d -p 5001:5001 --name service2 service2
 ```
 
 Isso irá:
@@ -361,6 +336,28 @@ Isso irá:
 ## Como funciona
 - Cada microsserviço possui seu Dockerfile e roda de forma independente.
 - A comunicação entre eles ocorre via HTTP Request, sem gateway.
+
+---
+
+### Testar a Comunicação
+
+Abra no navegador ou rode:
+
+```bash
+curl http://localhost:5000/users
+```
+
+---
+
+### Limpeza
+
+Para remover tudo:
+
+```bash
+docker stop service1 service2
+docker rm service1 service2
+docker image rm service1 service2
+```
 
 ---
 

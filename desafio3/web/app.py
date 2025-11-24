@@ -28,7 +28,7 @@ def index():
     # Teste de conexão ao Redis
     try:
         r = redis.Redis(host=redis_host, port=6379)
-        r.set("mensagem", "Conexão com Redis OK!")
+        r.set("mensagem", "Conexao com Redis OK!")
         cache_msg = r.get("mensagem").decode("utf-8")
     except Exception as e:
         cache_msg = f"Erro ao conectar no Redis: {e}"
